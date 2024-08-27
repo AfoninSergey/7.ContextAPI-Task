@@ -1,0 +1,13 @@
+.task {
+	display: flex;
+	justify-content: space-between;
+	background-color: #111827;
+	padding: 0 16px;
+	border-radius: 16px;
+	margin-bottom: 15px;
+	font-size: 1.125rem;
+}
+.task_actions {
+	display: flex;
+	flex-wrap: wrap;
+}
