@@ -1,28 +1,30 @@
-import { useContext, useState} from 'react';
+import { /* useContext,  */ useState } from 'react';
 import { createFetchTask } from '../../api';
 import { createTask, sortTasks, filterTasks, debounce } from '../../utils';
+import { useTasksContext } from '../../providers';
+
 import { Input } from '../input/Input';
 import { Button } from '../button/button';
 
 import styles from './control-panel.module.css';
-import { AppContext } from '../../context';
 
-export const Controlpanel = ({
-	taskList,
-	setIsError,
-	setTaskList,
-	isFilteringEnabled,
-	setIsFilteringEnabled,
-	setSortedAndFilteredTasklist,
-}) => {
+export const Controlpanel = () => {
+	const {
+		taskList,
+		setIsError,
+		setTaskList,
+		isFilteringEnabled,
+		setIsButtonDisabled,
+		setIsFilteringEnabled,
+		setSortedAndFilteredTasklist,
+	} = useTasksContext();
+
 	const [newTaskValue, setNewtaskValue] = useState('');
 	const [isInputEmptyCheck, setIsInputEmptyCheck] = useState(false);
 	const [filterPhrase, setFilterPhrase] = useState('');
 	const [isSortingEnabled, setIsSortingEnabled] = useState(false);
 	const [filteredTaskList, setFilteredTaskList] = useState([]);
 	const [sortedTaskList, setSortedTaskList] = useState([]);
-
-	const {setIsButtonDisabled} = useContext(AppContext)
 
 	const onTaskAdd = (event) => {
 		event.preventDefault();
@@ -59,7 +61,6 @@ export const Controlpanel = ({
 			setFilteredTaskList(filteredList);
 			setSortedAndFilteredTasklist(filteredList);
 		} else {
-			console.log(value);
 			setFilteredTaskList([]);
 			setSortedAndFilteredTasklist(sortedTaskList || []);
 			setIsFilteringEnabled(false);
@@ -69,6 +70,7 @@ export const Controlpanel = ({
 
 	const onSorting = () => {
 		setIsSortingEnabled(!isSortingEnabled);
+
 		if (!isSortingEnabled) {
 			const currentList =
 				filteredTaskList.length !== 0 || isFilteringEnabled
@@ -102,20 +104,13 @@ export const Controlpanel = ({
 					value={newTaskValue}
 					onChange={onNewTaskValueChange}
 				/>
-				<Button
-					className="taskAddButton"
-					type="submit"
-				>
+				<Button className="taskAddButton" type="submit">
 					Добавить
 				</Button>
 			</form>
 
 			<div className={styles.sortAndSearchBlock}>
-				<Button
-					className="sortButton"
-					type="button"
-					onClick={onSorting}
-				>
+				<Button className="sortButton" type="button" onClick={onSorting}>
 					{!isSortingEnabled
 						? 'Сортировать по алфавиту'
 						: 'Отменить сортировку'}

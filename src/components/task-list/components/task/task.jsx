@@ -1,17 +1,18 @@
-import { useContext, useState } from 'react';
-import { Input } from '../input/Input';
-import { Button } from '../button/button';
-import { updateFetchTask, deleteFetchTask } from '../../api';
-import { deleteTask, updateTask } from '../../utils';
+import { useState } from 'react';
+import { Input } from '../../../input/Input';
+import { Button } from '../../../button/button';
+import { updateFetchTask, deleteFetchTask } from '../../../../api';
+import { deleteTask, updateTask } from '../../../../utils';
 import styles from './task.module.css';
-import { AppContext } from '../../context';
+import { useTasksContext } from '../../../../providers';
 
-export const Task = ({ id, title, taskList, setIsError, setTaskList }) => {
+export const Task = ({ id, title }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isInputEmpty, setIsInputEmpty] = useState(false);
 	const [newTitle, setNewTitle] = useState('');
 
-	const { setIsButtonDisabled } = useContext(AppContext);
+	const { taskList, setIsError, setTaskList, setIsButtonDisabled } =
+		useTasksContext();
 
 	const onTitleChange = ({ target: { value } }) => {
 		setNewTitle(value);
@@ -55,13 +56,22 @@ export const Task = ({ id, title, taskList, setIsError, setTaskList }) => {
 
 	const onTaskDelete = () => {
 		setIsButtonDisabled(true);
-		deleteFetchTask(id)
-			.then(() => {
-				const ubdatedTaskList = deleteTask(taskList, id);
-				setTaskList(ubdatedTaskList);
-			})
-			.catch(() => setIsError(true))
-			.finally(() => setIsButtonDisabled(false));
+
+		if (!isEditing) {
+			deleteFetchTask(id)
+				.then(() => {
+					const ubdatedTaskList = deleteTask(taskList, id);
+					setTaskList(ubdatedTaskList);
+				})
+				.catch(() => setIsError(true))
+				.finally(() => setIsButtonDisabled(false));
+		} else {
+			setTaskList(taskList);
+			setIsInputEmpty(false);
+			setNewTitle('');
+			setIsButtonDisabled(false);
+			setIsEditing(false)
+		}
 	};
 
 	return (
@@ -83,7 +93,7 @@ export const Task = ({ id, title, taskList, setIsError, setTaskList }) => {
 					type="button"
 					onClick={onTaskDelete}
 				>
-					Удалить
+					{!isEditing ? 'Удалить' : 'Отменить'}
 				</Button>
 			</div>
 		</li>
